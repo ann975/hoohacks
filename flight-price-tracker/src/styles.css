@@ -12,8 +12,8 @@ html, body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #000000; /* Light gray background */
-  font-family: Futura, sans-serif;
+  background-image: linear-gradient(to right, pink , blue);
+  font-family: Arial, sans-serif;
 }
 
 /* Center the content */
@@ -47,8 +47,9 @@ html, body {
   padding: 10px;
   background-color: #007bff;
   color: white;
+  align-items: center;
   border: none;
-  border-radius: 5px;
+  border-radius: 4px;
   cursor: pointer;
   transition: background 0.2s;
   font-size: 16px;

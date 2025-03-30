@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 
 #Read data
-data = pd.read_csv('iad_lax_flights.csv')
+data = pd.read_json('cheapest_flight.json')
 #print(data.head())
 
 data['Departure Date'] = pd.to_datetime(data['Departure Date'])

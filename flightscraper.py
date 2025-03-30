@@ -1,157 +1,124 @@
-from time import sleep, strftime
-from random import randint
-import pandas as pd
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager 
+import os
+import time
+import requests
+from dotenv import load_dotenv
 
-driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))  
-sleep(2)
+load_dotenv()
 
-def load_more():
-    try:
-        more_results = '//a[@class = "moreButton"]'
-        driver.find_element(By.XPATH, more_results).click()
-        print('sleeping.....')
-        sleep(randint(25, 35))
-    except Exception as e:
-        print(f"Error during load_more: {e}")
-        pass
+IATA_ENDPOINT = "https://test.api.amadeus.com/v1/reference-data/locations/cities"
+FLIGHT_ENDPOINT = "https://test.api.amadeus.com/v2/shopping/flight-offers"
+TOKEN_ENDPOINT = "https://test.api.amadeus.com/v1/security/oauth2/token"
 
-def start_kayak(city_from, city_to, date_start, date_end):
-    kayak_url = f'https://www.kayak.com/flights/{city_from}-{city_to}/{date_start}-flexible/{date_end}-flexible?sort=bestflight_a'
-    driver.get(kayak_url)
-    sleep(randint(8, 10))
+class FlightScraper:
+    def __init__(self):
+        self._api_key = os.environ["AMADEUS_API_KEY"]
+        self._api_secret = os.environ["AMADEUS_SECRET"]
+        self._token = self._get_new_token()
 
-    try:
-        xp_popup_close = '//button[contains(@id,"dialog-close") and contains(@class,"Button-No-Standard-Style close ")]'
-        popup_buttons = driver.find_elements(By.XPATH, xp_popup_close)
-        if len(popup_buttons) > 0:
-            popup_buttons[0].click()  
-            print('Popup closed.')
+    def _get_new_token(self):
+        header = {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+        body = {
+            'grant_type': 'client_credentials',
+            'client_id': self._api_key,
+            'client_secret': self._api_secret
+        }
+        response = requests.post(url=TOKEN_ENDPOINT, headers=header, data=body)
+        if response.status_code == 200:
+            print(f"Your token is {response.json()['access_token']}")
+            print(f"Your token expires in {response.json()['expires_in']} seconds")
+            return response.json()['access_token']
         else:
-            print('No popup found.')
-    except Exception as e:
-        print(f"Error closing popup: {e}")
-        pass
+            print(f"Error fetching token: {response.status_code}")
+            return None
 
-    sleep(randint(60, 95))
+    def get_destination_code(self, city_name):
+        headers = {"Authorization": f"Bearer {self._token}"}
+        query = {
+            "keyword": city_name,
+            "max": "2",
+            "include": "AIRPORTS",
+        }
+        response = requests.get(url=IATA_ENDPOINT, headers=headers, params=query)
 
-    # Switch to cheapest results
-    print('Switching to cheapest results...')
-    cheap_results = '//a[@data-code = "price"]'
-    driver.find_element(By.XPATH, cheap_results).click()
-    sleep(randint(60, 90))
+        if response.status_code == 200:
+            try:
+                code = response.json()["data"][0]['iataCode']
+                return code
+            except IndexError:
+                print(f"IndexError: No airport code found for {city_name}.")
+                return "N/A"
+            except KeyError:
+                print(f"KeyError: No airport code found for {city_name}.")
+                return "N/A"
+        else:
+            print(f"Error fetching destination code: {response.status_code}")
+            return "N/A"
 
-    # Scrape cheapest results only
-    print('Starting cheapest flights scrape...')
-    df_flights_cheap = page_scrape()
-    df_flights_cheap['sort'] = 'cheap'
-    sleep(randint(60, 80))
+    def find_flights(self, origin, destination, departure_date, return_date):
+        headers = {"Authorization": f"Bearer {self._token}"}
+        query = {
+            "originLocationCode": origin,
+            "destinationLocationCode": destination,
+            "departureDate": departure_date,
+            "returnDate": return_date,
+            "adults": 1,
+            "currencyCode": "USD"
+        }
 
-    # Save to CSV file
-    df_flights_cheap.to_csv(f'search_backups//{strftime("%Y%m%d-%H%M")}_flights_{city_from}_{city_to}_{date_start}_{date_end}_cheap.csv', index=False)
-    print('Saved data to CSV...')
+        response = requests.get(url=FLIGHT_ENDPOINT, headers=headers, params=query)
 
-def page_scrape():
-    # Extract flight details from the page
-    xp_sections = '//*[@class="section duration"]'
-    sections = driver.find_elements(By.XPATH, xp_sections)
-    sections_list = [value.text for value in sections]
-    section_a_list = sections_list[::2]
-    section_b_list = sections_list[1::2]
-    
-    if not section_a_list:
-        raise SystemExit("No flight data found!")
-    
-    # Process each section of data
-    a_duration = []
-    a_section_names = []
-    for n in section_a_list:
-        a_section_names.append(''.join(n.split()[2:5]))
-        a_duration.append(''.join(n.split()[0:2]))
+        if response.status_code == 200:
+            flight_data = response.json()
+            return flight_data
+        else:
+            print(f"Error fetching flight data: {response.status_code}")
+            return None
 
-    b_duration = []
-    b_section_names = []
-    for n in section_b_list:
-        b_section_names.append(''.join(n.split()[2:5]))
-        b_duration.append(''.join(n.split()[0:2]))
+    def find_lowest_price(self, flight_data):
 
-    # Extract other flight details (e.g., prices, stops, cities)
-    xp_prices = '//a[@class="booking-link"]/span[@class="price option-text"]'
-    prices = driver.find_elements(By.XPATH, xp_prices)
-    prices_list = [price.text.replace('$', '') for price in prices if price.text != '']
-    prices_list = list(map(int, prices_list))
+        if not flight_data or "data" not in flight_data:
+            print("No flight offers available.")
+            return None
 
-    xp_stops = '//div[@class="section stops"]/div[1]'
-    stops = driver.find_elements(By.XPATH, xp_stops)
-    stops_list = [stop.text[0].replace('n', '0') for stop in stops]
-    a_stop_list = stops_list[::2]
-    b_stop_list = stops_list[1::2]
+        lowest_price = float('inf')
+        lowest_price_flight = None
 
-    xp_stops_cities = '//div[@class="section stops"]/div[2]'
-    stops_cities = driver.find_elements(By.XPATH, xp_stops_cities)
-    stops_cities_list = [stop.text for stop in stops_cities]
-    a_stop_name_list = stops_cities_list[::2]
-    b_stop_name_list = stops_cities_list[1::2]
+        for offer in flight_data["data"]:
+            price = float(offer["price"]["total"])
+            if price < lowest_price:
+                lowest_price = price
+                lowest_price_flight = offer
 
-    xp_schedule = '//div[@class="section times"]'
-    schedules = driver.find_elements(By.XPATH, xp_schedule)
-    hours_list = []
-    carrier_list = []
-    for schedule in schedules:
-        hours_list.append(schedule.text.split('\n')[0])
-        carrier_list.append(schedule.text.split('\n')[1])
-    a_hours = hours_list[::2]
-    a_carrier = carrier_list[::2]
-    b_hours = hours_list[1::2]
-    b_carrier = carrier_list[1::2]
+        if lowest_price_flight:
+            return lowest_price_flight["price"]["total"]
+        else:
+            return None
 
-    # Extract dates and weekdays
-    xp_dates = '//div[@class="section date"]'
-    dates = driver.find_elements(By.XPATH, xp_dates)
-    dates_list = [value.text for value in dates]
-    a_date_list = dates_list[::2]
-    b_date_list = dates_list[1::2]
-    a_day = [value.split()[0] for value in a_date_list]
-    a_weekday = [value.split()[1] for value in a_date_list]
-    b_day = [value.split()[0] for value in b_date_list]
-    b_weekday = [value.split()[1] for value in b_date_list]
+if __name__ == "__main__":
+    flight_scraper = FlightScraper()
 
-    # Creating the final DataFrame
-    flights_df = pd.DataFrame({
-        'Out Day': a_day,
-        'Out Weekday': a_weekday,
-        'Out Duration': a_duration,
-        'Out Cities': a_section_names,
-        'Return Day': b_day,
-        'Return Weekday': b_weekday,
-        'Return Duration': b_duration,
-        'Return Cities': b_section_names,
-        'Out Stops': a_stop_list,
-        'Out Stop Cities': a_stop_name_list,
-        'Return Stops': b_stop_list,
-        'Return Stop Cities': b_stop_name_list,
-        'Out Time': a_hours,
-        'Out Airline': a_carrier,
-        'Return Time': b_hours,
-        'Return Airline': b_carrier,                           
-        'Price': prices_list
-    })
+    origin_city = "DCA"  
+    destination_city = "LAX"  
+    departure_date = "2025-03-01"  
+    return_date = "2025-03-05"  
 
-    flights_df['timestamp'] = strftime("%Y%m%d-%H%M")
-    return flights_df
+    origin_code = flight_scraper.get_destination_code(origin_city)
+    destination_code = flight_scraper.get_destination_code(destination_city)
 
-# Example usage
-city_from = input('From which city? ')
-city_to = input('Where to? ')
-date_start = input('Search around which departure date? Please use YYYY-MM-DD format only ')
-date_end = input('Return when? Please use YYYY-MM-DD format only ')
+    if origin_code != "N/A" and destination_code != "N/A":
+        flight_data = flight_scraper.find_flights(origin_code, destination_code, departure_date, return_date)
+        if flight_data:
+            print("Flight Data:")
+            print(flight_data)
 
-for n in range(0, 5):
-    start_kayak(city_from, city_to, date_start, date_end)
-    print(f'Iteration {n} was complete @ {strftime("%Y%m%d-%H%M")}')
-    sleep(60 * 60 * 4)  # Sleep between iterations
-
-driver.quit()
+            lowest_price = flight_scraper.find_lowest_price(flight_data)
+            if lowest_price:
+                print(f"\nThe lowest price for flights from {origin_city} to {destination_city} from {departure_date} to {return_date} is: ${lowest_price}")
+            else:
+                print("\nNo flights found with a price.")
+        else:
+            print("No flight data found.")
+    else:
+        print("Could not find IATA codes for the given cities.")

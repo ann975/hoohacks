@@ -26,8 +26,6 @@ class FlightScraper:
         }
         response = requests.post(url=TOKEN_ENDPOINT, headers=header, data=body)
         if response.status_code == 200:
-            print(f"Your token is {response.json()['access_token']}")
-            print(f"Your token expires in {response.json()['expires_in']} seconds")
             return response.json()['access_token']
         else:
             print(f"Error fetching token: {response.status_code}")
@@ -48,9 +46,6 @@ class FlightScraper:
                 return code
             except IndexError:
                 print(f"IndexError: No airport code found for {city_name}.")
-                return "N/A"
-            except KeyError:
-                print(f"KeyError: No airport code found for {city_name}.")
                 return "N/A"
         else:
             print(f"Error fetching destination code: {response.status_code}")
@@ -115,9 +110,9 @@ if __name__ == "__main__":
 
             lowest_price = flight_scraper.find_lowest_price(flight_data)
             if lowest_price:
-                print(f"\nThe lowest price for flights from {origin_city} to {destination_city} from {departure_date} to {return_date} is: ${lowest_price}")
+                print(f"\nLowest price for flights from {origin_city} to {destination_city} from {departure_date} to {return_date} is: ${lowest_price}")
             else:
-                print("\nNo flights found with a price.")
+                print("\nNo flights found")
         else:
             print("No flight data found.")
     else:

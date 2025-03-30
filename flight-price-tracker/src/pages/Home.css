@@ -1,40 +1,85 @@
-/* styles.css */
-body, html {
-    margin: 0;
-    padding: 0;
-    font-family: Futura, sans-serif;
-    line-height: 1.6;
+/* Home.css */
+.flex {
+    display: flex;
   }
   
-  h1 {
-    text-align: center;
-    color: #1e3a8a;
-    margin: 2rem 0 1.5rem;
-    letter-spacing: 0.5px;
+  .flex-col {
+    flex-direction: column;
   }
   
-  button {
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: transform 0.2s ease-in-out;
-    padding: 0.75rem 1.5rem;
-    margin: 0.5rem;
-    border: none;
-    outline: none;
+  .items-center {
+    align-items: center;
   }
   
-  button:hover {
-    transform: scale(1.05);
+  .justify-center {
+    justify-content: center;
   }
   
-  /* Home.css */
+  .min-h-screen {
+    min-height: 100vh;
+  }
+  
+  .bg-gradient-to-b {
+    background-image: linear-gradient(to bottom, var(--tw-gradient-stops));
+  }
+  
+  .from-blue-50 {
+    --tw-gradient-stops: #eff6ff, var(--tw-gradient-to);
+  }
+  
+  .to-blue-200 {
+    --tw-gradient-to: #bfdbfe;
+  }
+  
+  .p-4 {
+    padding: 1rem;
+  }
+  
+  .max-w-3xl {
+    max-width: 48rem;
+  }
+  
   .text-center {
     text-align: center;
   }
   
-  .max-w-2xl {
-    max-width: 42rem;
+  .text-4xl {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+  }
+  
+  .md\:text-5xl {
+    font-size: 3rem;
+    line-height: 1;
+  }
+  
+  .font-bold {
+    font-weight: 700;
+  }
+  
+  .mb-4 {
+    margin-bottom: 1rem;
+  }
+  
+  .text-blue-800 {
+    color: #1e40af;
+  }
+  
+  .text-lg {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+  }
+  
+  .text-gray-700 {
+    color: #374151;
+  }
+  
+  .mb-8 {
+    margin-bottom: 2rem;
+  }
+  
+  .max-w-xl {
+    max-width: 36rem;
   }
   
   .mx-auto {
@@ -42,40 +87,166 @@ body, html {
     margin-right: auto;
   }
   
-  .px-4 {
-    padding-left: 1rem;
-    padding-right: 1rem;
+  .space-y-4 > * + * {
+    margin-top: 1rem;
   }
   
-  .mb-6 {
-    margin-bottom: 1.5rem;
+  .w-full {
+    width: 100%;
   }
   
-  .mb-8 {
-    margin-bottom: 2rem;
+  .px-8 {
+    padding-left: 2rem;
+    padding-right: 2rem;
   }
   
-  .mt-10 {
-    margin-top: 2.5rem;
+  .py-4 {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+  
+  .bg-blue-600 {
+    background-color: #2563eb;
+  }
+  
+  .text-white {
+    color: #0b0909;
+  }
+  
+  .rounded-lg {
+    border-radius: 0.5rem;
+  }
+  
+  .hover\:bg-blue-700:hover {
+    background-color: #1d4ed8;
+  }
+  
+  .transition-colors {
+    transition-property: background-color, border-color, color, fill, stroke;
+  }
+  
+  .duration-300 {
+    transition-duration: 300ms;
+  }
+  
+  .shadow-lg {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+  
+  .focus\:outline-none:focus {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+  }
+  
+  .focus\:ring-2:focus {
+    --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+    --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+    box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+  }
+  
+  .focus\:ring-blue-500:focus {
+    --tw-ring-color: #3b82f6;
+  }
+  
+  .focus\:ring-opacity-50:focus {
+    --tw-ring-opacity: 0.5;
+  }
+  
+  .bg-white {
+    background-color: #ffffff;
+  }
+  
+  .text-blue-600 {
+    color: #2563eb;
+  }
+  
+  .border {
+    border-width: 1px;
+  }
+  
+  .border-blue-600 {
+    border-color: #2563eb;
+  }
+  
+  .hover\:bg-blue-50:hover {
+    background-color: #eff6ff;
+  }
+  
+  .mt-16 {
+    margin-top: 4rem;
+  }
+  
+  .text-sm {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+  
+  .text-gray-600 {
+    color: #4b5563;
+  }
+  
+  /* Additional custom styles */
+  .hero-container {
+    backdrop-filter: blur(5px);
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 16px;
+    padding: 2.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    margin: 2rem auto;
+    max-width: 90%;
+  }
+  
+  .logo-text {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 900;
+  }
+  
+  .cta-button-primary {
+    background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+    border: none;
+    color: white;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  
+  .cta-button-secondary {
+    background: white;
+    border: 2px solid #2563eb;
+    color: #2563eb;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  
+  .feature-tag {
+    display: inline-block;
+    background-color: rgba(59, 130, 246, 0.1);
+    color: #2563eb;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
   }
   
   @media (max-width: 768px) {
-    .flex-col {
-      flex-direction: column;
+    .md\:flex {
+      display: block;
     }
     
-    .space-y-4 > * + * {
-      margin-top: 1rem;
+    .md\:space-x-4 {
+      margin-left: 0;
     }
     
-    .w-full {
-      width: 100%;
+    .hero-container {
+      padding: 1.5rem;
     }
   }
   
   @media (min-width: 768px) {
-    .md\:flex-row {
-      flex-direction: row;
+    .md\:flex {
+      display: flex;
     }
     
     .md\:space-y-0 > * + * {
@@ -90,3 +261,97 @@ body, html {
       width: auto;
     }
   }
+
+  /* Add to your CSS file */
+.hero-container {
+    backdrop-filter: blur(5px);
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 16px;
+    padding: 2.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    margin: 2rem auto;
+    max-width: 90%;
+  }
+
+/* Cat airplane decorations */
+.cat-airplane {
+    position: absolute;
+    width: 150px;  /* Increased from 80px */
+    height: 150px; /* Increased from 80px */
+    background-image: url('./cat-airplane.gif');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Position each cat airplane with custom sizes */
+.cat-airplane.cat-1 {
+    width: 180px;
+    height: 180px;
+    top: 10%;
+    left: 10%;
+    animation: float 12s infinite ease-in-out;
+}
+
+.cat-airplane.cat-2 {
+    width: 160px;
+    height: 160px;
+    top: 15%;
+    right: 10%;
+    transform: scaleX(-1); /* Flip horizontally */
+    animation: float 15s infinite ease-in-out reverse;
+}
+
+.cat-airplane.cat-3 {
+    width: 170px;
+    height: 170px;
+    bottom: 15%;
+    left: 15%;
+    animation: float 18s infinite ease-in-out 2s;
+}
+
+.cat-airplane.cat-4 {
+    width: 150px;
+    height: 150px;
+    bottom: 20%;
+    right: 15%;
+    transform: scaleX(-1); /* Flip horizontally */
+    animation: float 14s infinite ease-in-out 1s;
+}
+
+/* Update media query for mobile */
+@media (max-width: 768px) {
+    .cat-airplane {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .cat-airplane.cat-3,
+    .cat-airplane.cat-4 {
+        display: none; /* Hide bottom cats on mobile */
+    }
+}
+
+
+/* Cat logo styling */
+.cat-logo-container {
+    margin-bottom: 1.5rem;
+    z-index: 10;
+    position: relative;
+  }
+  
+  .cat-logo {
+    width: 120px;
+    height: auto;
+    border-radius: 50%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  @media (max-width: 768px) {
+    .cat-logo {
+      width: 100px;
+    }
+  }
+  

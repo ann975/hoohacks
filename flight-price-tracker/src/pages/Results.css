@@ -1,0 +1,262 @@
+/* Main container styling */
+.results-page {
+    background-image: linear-gradient(to right, #f9d2e1, #e0eafc, #cfdef3);
+    min-height: 100vh;
+    padding: 2rem;
+    position: relative;
+    overflow: visible;
+  }
+  
+  .results-container {
+    position: relative;
+    z-index: 10;
+    max-width: 800px;
+    margin: 0 auto;
+    padding-top: 200px; /* Space at the top for your logo */
+  }
+  
+  /* Logo styling */
+  .logo-container {
+    position: absolute;
+    top: 130px; /* Moved down from 40px */
+    left: 0;
+    width: 100%;
+    text-align: center;
+    z-index: 20;
+  }
+  
+  .cat-logo {
+    max-height: 150px;
+    margin: 0 auto;
+  }
+  
+  /* Header styling */
+  .header-container {
+    background-color: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 30px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border-left: 4px solid #4169e1;
+  }
+  
+  .destination-title {
+    color: #4169e1;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+  
+  .budget-text {
+    color: #6b7280;
+    font-size: 1rem;
+  }
+  
+  /* Flight card styling */
+  .flight-cards-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .flight-card {
+    background-color: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    position: relative;
+    border-left: 3px solid #4169e1;
+    margin-bottom: 1rem;
+  }
+  
+  .airline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .airline-name {
+    color: #4169e1;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+  
+  .price-tag {
+    background-color: #4169e1;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+  }
+  
+  .flight-times {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .departure, .arrival {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .time {
+    color: #4169e1;
+    font-weight: 500;
+    font-size: 1.1rem;
+  }
+  
+  .label {
+    color: #6b7280;
+    font-size: 0.9rem;
+  }
+  
+  .duration {
+    text-align: center;
+    color: #6b7280;
+    font-size: 0.9rem;
+  }
+  
+  .flight-class, .flight-type {
+    color: #6b7280;
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  .book-now-button {
+    position: absolute;
+    right: 1.5rem;
+    bottom: 1.5rem;
+    background-color: #4169e1;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.2s;
+  }
+  
+  .book-now-button:hover {
+    background-color: #3457c0;
+  }
+  
+  /* No results styling */
+  .no-results {
+    background-color: white;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  }
+  
+  /* Cat airplane decorations - NEW STYLING */
+  .cat-airplane-decoration {
+    position: fixed; /* Use fixed positioning to ensure they stay on screen */
+    width: 150px;
+    height: 150px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: 5;
+    pointer-events: none; /* Prevents interaction with the decorations */
+  }
+  
+  /* Position each cat airplane with custom sizes */
+  .cat-airplane-decoration.cat-1 {
+    width: 180px;
+    height: 180px;
+    top: 20%;
+    left: 30px; /* Fixed position from left edge */
+    animation: float 12s infinite ease-in-out;
+  }
+  
+  .cat-airplane-decoration.cat-2 {
+    width: 160px;
+    height: 160px;
+    top: 15%;
+    right: 30px; /* Fixed position from right edge */
+    transform: scaleX(-1); /* Flip horizontally */
+    animation: float 15s infinite ease-in-out reverse;
+  }
+  
+  .cat-airplane-decoration.cat-3 {
+    width: 170px;
+    height: 170px;
+    bottom: 25%;
+    left: 30px; /* Fixed position from left edge */
+    animation: float 18s infinite ease-in-out 2s;
+  }
+  
+  .cat-airplane-decoration.cat-4 {
+    width: 150px;
+    height: 150px;
+    bottom: 15%;
+    right: 30px; /* Fixed position from right edge */
+    transform: scaleX(-1); /* Flip horizontally */
+    animation: float 14s infinite ease-in-out 1s;
+  }
+  
+  /* Add the float animation */
+  @keyframes float {
+    0% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+    100% {
+      transform: translateY(0px);
+    }
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .results-page {
+      padding: 1rem;
+    }
+    
+    .results-container {
+      padding-top: 150px;
+    }
+    
+    .destination-title {
+      font-size: 1.8rem;
+    }
+    
+    .flight-card {
+      padding: 1.25rem;
+    }
+    
+    .book-now-button {
+      right: 1.25rem;
+      bottom: 1.25rem;
+    }
+    
+    .cat-logo {
+      max-height: 100px;
+      top: 300px;
+    }
+    
+    /* Adjust cat airplane decorations for mobile */
+    .cat-airplane-decoration {
+      width: 100px;
+      height: 100px;
+    }
+    
+    .cat-airplane-decoration.cat-1 {
+      left: 10px;
+    }
+    
+    .cat-airplane-decoration.cat-2 {
+      right: 10px;
+    }
+    
+    /* Hide bottom cats on mobile */
+    .cat-airplane-decoration.cat-3,
+    .cat-airplane-decoration.cat-4 {
+      display: none;
+    }
+  }

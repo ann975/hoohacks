@@ -1,0 +1,154 @@
+/* Search.css */
+
+/* Main container styling */
+.search-container {
+    backdrop-filter: blur(5px);
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 2.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    margin: 2rem auto;
+    max-width: 90%;
+    position: relative;
+    z-index: 10;
+  }
+  
+  /* Input styling */
+  .input-group {
+    margin-bottom: 1.5rem;
+    width: 100%;
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    background-color: rgba(0, 0, 0, 0.2);
+    color: white;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    outline: none;
+  }
+  
+  .search-input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+  }
+  
+  .search-input:focus {
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+  }
+  
+  /* Button styling */
+  .search-button {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 0.5rem;
+  }
+  
+  .search-button:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+    transform: translateY(-2px);
+  }
+  
+  /* Cat airplane decorations */
+  .cat-airplane {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    background-image: url('./cat-airplane.gif');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: 1;
+    pointer-events: none; /* Makes sure clicks pass through */
+  }
+  
+  /* Position each cat airplane */
+  .cat-airplane.cat-1 {
+    top: 10%;
+    left: 10%;
+    animation: float 12s infinite ease-in-out;
+  }
+  
+  .cat-airplane.cat-2 {
+    top: 15%;
+    right: 10%;
+    transform: scaleX(-1); /* Flip horizontally */
+    animation: float 15s infinite ease-in-out reverse;
+  }
+  
+  .cat-airplane.cat-3 {
+    bottom: 15%;
+    left: 15%;
+    animation: float 18s infinite ease-in-out 2s;
+  }
+  
+  .cat-airplane.cat-4 {
+    bottom: 20%;
+    right: 15%;
+    transform: scaleX(-1); /* Flip horizontally */
+    animation: float 14s infinite ease-in-out 1s;
+  }
+  
+  /* Floating animation */
+  @keyframes float {
+    0% {
+      transform: translateY(0) rotate(0deg);
+    }
+    25% {
+      transform: translateY(-15px) rotate(5deg);
+    }
+    50% {
+      transform: translateY(0) rotate(0deg);
+    }
+    75% {
+      transform: translateY(15px) rotate(-5deg);
+    }
+    100% {
+      transform: translateY(0) rotate(0deg);
+    }
+  }
+  
+  /* Make sure the cat-airplane elements don't affect layout on small screens */
+  @media (max-width: 768px) {
+    .cat-airplane {
+      width: 60px;
+      height: 60px;
+    }
+    
+    .cat-airplane.cat-3,
+    .cat-airplane.cat-4 {
+      display: none; /* Hide bottom cats on mobile */
+    }
+  }
+
+  /* Cat logo styling */
+.cat-logo-container {
+    margin-bottom: 1.5rem;
+    z-index: 10;
+    position: relative;
+  }
+  
+  .cat-logo {
+    width: 120px;
+    height: auto;
+    border-radius: 50%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  @media (max-width: 768px) {
+    .cat-logo {
+      width: 100px;
+    }
+  }
+  

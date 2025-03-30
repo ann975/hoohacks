@@ -1,15 +1,17 @@
 import os
-import time
 import requests
+import json
 from dotenv import load_dotenv
+from datetime import datetime
 
 load_dotenv()
 
 IATA_ENDPOINT = "https://test.api.amadeus.com/v1/reference-data/locations/cities"
 FLIGHT_ENDPOINT = "https://test.api.amadeus.com/v2/shopping/flight-offers"
 TOKEN_ENDPOINT = "https://test.api.amadeus.com/v1/security/oauth2/token"
+EXCHANGE_RATE_API_URL = "https://v6.exchangerate-api.com/v6/YOUR_API_KEY/latest/"  
 
-class FlightScraper:
+class FlightSearch:
     def __init__(self):
         self._api_key = os.environ["AMADEUS_API_KEY"]
         self._api_secret = os.environ["AMADEUS_SECRET"]
@@ -25,95 +27,132 @@ class FlightScraper:
             'client_secret': self._api_secret
         }
         response = requests.post(url=TOKEN_ENDPOINT, headers=header, data=body)
+        return response.json()['access_token']
+
+    def convert_to_usd(self, amount, currency):
+        """
+        Converts the amount from any currency to USD using the Exchange Rate API.
+        """
+        if currency == "USD":
+            return amount  
+
+        response = requests.get(f"{EXCHANGE_RATE_API_URL}{currency}")
         if response.status_code == 200:
-            return response.json()['access_token']
+            exchange_data = response.json()
+            conversion_rate = exchange_data["conversion_rates"].get("USD")
+            if conversion_rate:
+                return amount * conversion_rate
+            else:
+                print(f"Error: Conversion rate for {currency} to USD not found.")
+                return amount
         else:
-            print(f"Error fetching token: {response.status_code}")
-            return None
+            print(f"Error: Failed to get exchange rate for {currency}.")
+            return amount
 
-    def get_destination_code(self, city_name):
-        headers = {"Authorization": f"Bearer {self._token}"}
-        query = {
-            "keyword": city_name,
-            "max": "2",
-            "include": "AIRPORTS",
-        }
-        response = requests.get(url=IATA_ENDPOINT, headers=headers, params=query)
-
-        if response.status_code == 200:
-            try:
-                code = response.json()["data"][0]['iataCode']
-                return code
-            except IndexError:
-                print(f"IndexError: No airport code found for {city_name}.")
-                return "N/A"
-        else:
-            print(f"Error fetching destination code: {response.status_code}")
-            return "N/A"
-
-    def find_flights(self, origin, destination, departure_date, return_date):
+    def get_cheapest_flight(self, origin, destination, departure_date, return_date=None):
+        """
+        Retrieves the cheapest flight between two cities for specific dates using the Amadeus Flight API.
+        Parameters:
+        origin (str): The IATA code of the departure city.
+        destination (str): The IATA code of the arrival city.
+        departure_date (str): The departure date in format YYYY-MM-DD.
+        return_date (str, optional): The return date in format YYYY-MM-DD.
+        Returns:
+        dict: The cheapest flight details.
+        """
         headers = {"Authorization": f"Bearer {self._token}"}
         query = {
             "originLocationCode": origin,
             "destinationLocationCode": destination,
             "departureDate": departure_date,
-            "returnDate": return_date,
             "adults": 1,
-            "currencyCode": "USD"
+            "max": 1  
         }
 
-        response = requests.get(url=FLIGHT_ENDPOINT, headers=headers, params=query)
+        if return_date:
+            query["returnDate"] = return_date
+
+        response = requests.get(
+            url=FLIGHT_ENDPOINT,
+            headers=headers,
+            params=query
+        )
 
         if response.status_code == 200:
             flight_data = response.json()
-            return flight_data
+            if flight_data['data']:
+                cheapest_flight = flight_data['data'][0]  
+                return cheapest_flight
+            else:
+                print("No flights found.")
+                return None
         else:
-            print(f"Error fetching flight data: {response.status_code}")
+            print(f"Error: {response.status_code} - {response.text}")
             return None
 
-    def find_lowest_price(self, flight_data):
+def main():
+    flight_search = FlightSearch()
 
-        if not flight_data or "data" not in flight_data:
-            print("No flight offers available.")
-            return None
+    origin_code = "DCA" 
+    destination_code = "LAX"  
 
-        lowest_price = float('inf')
-        lowest_price_flight = None
 
-        for offer in flight_data["data"]:
-            price = float(offer["price"]["total"])
-            if price < lowest_price:
-                lowest_price = price
-                lowest_price_flight = offer
+    departure_date = input("Please enter the departure date (YYYY-MM-DD): ")
+    while not is_valid_date(departure_date):
+        departure_date = input("Invalid date format. Please enter the departure date (YYYY-MM-DD): ")
 
-        if lowest_price_flight:
-            return lowest_price_flight["price"]["total"]
-        else:
-            return None
+    return_date = input("Please enter the return date (YYYY-MM-DD), or press Enter to skip: ")
+    if return_date and not is_valid_date(return_date):
+        while not is_valid_date(return_date):
+            return_date = input("Invalid date format. Please enter the return date (YYYY-MM-DD), or press Enter to skip: ")
+
+    cheapest_flight = flight_search.get_cheapest_flight(
+        origin=origin_code,
+        destination=destination_code,
+        departure_date=departure_date,
+        return_date=return_date if return_date else None
+    )
+
+    if cheapest_flight:
+        print(f"Cheapest Flight Details:")
+        print(f"Origin: Washington D.C. (DCA)")
+        print(f"Destination: Los Angeles (LAX)")
+        print(f"Departure Date: {departure_date}")
+        print(f"Return Date: {return_date if return_date else 'N/A'}")
+
+        flight_price = cheapest_flight['price']['total']
+        flight_currency = cheapest_flight['price']['currency']
+        flight_price_in_usd = flight_search.convert_to_usd(float(flight_price), flight_currency)
+
+        print(f"Price: {flight_price_in_usd:.2f} USD")
+        print(f"Airline: {cheapest_flight['validatingAirlineCodes'][0]}")
+    
+        try:
+            flight_number = cheapest_flight['itineraries'][0]['segments'][0]['flightSegment']['marketingCarrier']['flightNumber']
+            print(f"Flight Number: {flight_number}")
+        except KeyError as e:
+            print(f"Error extracting flight number: {e}")
+            print("Details available in response data:")
+            print(cheapest_flight)
+
+        with open("cheapest_flight.json", "w") as json_file:
+            json.dump(cheapest_flight, json_file, indent=4)
+
+        print(f"\nThe cheapest flight price from DCA to LAX is {flight_price_in_usd:.2f} USD.")
+
+    else:
+        print("Could not find any flights.")
+
+def is_valid_date(date_string):
+    """
+    Validates the date format (YYYY-MM-DD).
+    Returns True if the format is valid, else False.
+    """
+    try:
+        datetime.strptime(date_string, '%Y-%m-%d')
+        return True
+    except ValueError:
+        return False
 
 if __name__ == "__main__":
-    flight_scraper = FlightScraper()
-
-    origin_city = "DCA"  
-    destination_city = "LAX"  
-    departure_date = "2025-03-01"  
-    return_date = "2025-03-05"  
-
-    origin_code = flight_scraper.get_destination_code(origin_city)
-    destination_code = flight_scraper.get_destination_code(destination_city)
-
-    if origin_code != "N/A" and destination_code != "N/A":
-        flight_data = flight_scraper.find_flights(origin_code, destination_code, departure_date, return_date)
-        if flight_data:
-            print("Flight Data:")
-            print(flight_data)
-
-            lowest_price = flight_scraper.find_lowest_price(flight_data)
-            if lowest_price:
-                print(f"\nLowest price for flights from {origin_city} to {destination_city} from {departure_date} to {return_date} is: ${lowest_price}")
-            else:
-                print("\nNo flights found")
-        else:
-            print("No flight data found.")
-    else:
-        print("Could not find IATA codes for the given cities.")
+    main()

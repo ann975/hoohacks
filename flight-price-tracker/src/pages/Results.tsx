@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import "../styles.css";
 import "./Results.css";
-import catAirplaneGif from "./cat-airplane.gif"; // Import the GIF
-import catLogo from "./cat-logo.jpg"; // Import the cat logo
+import catAirplaneGif from "./cat-airplane.gif";
+import catLogo from "./cat-logo.jpg";
 
 interface Flight {
   airline: string;
@@ -18,48 +18,54 @@ interface Flight {
 const Results = () => {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
-  const destination = params.get("destination") || "San Diego";
-  const budget = params.get("budget") || "400";
+  const origin = params.get("origin") || "DCA";
+  const destination = params.get("destination") || "";
+  const budget = params.get("budget") || "300";
+  const departureDate = params.get("departureDate") || "";
+  const returnDate = params.get("returnDate") || "";
 
   const [flights, setFlights] = useState<Flight[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Mock flight data (replace with actual API call later)
-    const mockFlights: Flight[] = [
-      {
-        airline: "Delta",
-        price: 250,
-        link: "https://www.delta.com",
-        departureTime: "08:30 AM",
-        arrivalTime: "11:45 AM",
-        duration: "3h 15m",
-        stops: 0
-      },
-      {
-        airline: "United",
-        price: 300,
-        link: "https://www.united.com",
-        departureTime: "10:15 AM",
-        arrivalTime: "01:30 PM",
-        duration: "3h 15m",
-        stops: 0
-      },
-      {
-        airline: "Southwest",
-        price: 180,
-        link: "https://www.southwest.com",
-        departureTime: "07:45 AM",
-        arrivalTime: "11:20 AM",
-        duration: "3h 35m",
-        stops: 1
-      },
-    ];
+    async function fetchFlights() {
+      try {
+        setLoading(true);
+        
+        const response = await fetch('http://localhost:5000/api/search-flights', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            origin,
+            destination,
+            budget,
+            departureDate,
+            returnDate: returnDate || undefined
+          }),
+        });
 
-    const filteredFlights = mockFlights.filter(
-      (flight) => flight.price <= Number(budget)
-    );
-    setFlights(filteredFlights);
-  }, [budget]);
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to fetch flights');
+        }
+
+        const flightData = await response.json();
+        setFlights(flightData);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching flights:', err);
+        setError(err instanceof Error ? err.message : 'An unknown error occurred');
+        setFlights([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchFlights();
+  }, [origin, destination, budget, departureDate, returnDate]);
 
   return (
     <div className="results-page">
@@ -69,23 +75,37 @@ const Results = () => {
       <div className="cat-airplane-decoration cat-3" style={{backgroundImage: `url(${catAirplaneGif})`}}></div>
       <div className="cat-airplane-decoration cat-4" style={{backgroundImage: `url(${catAirplaneGif})`}}></div>
       
+      <div className="logo-container">
+        <img src={catLogo} alt="FareCat Logo" className="cat-logo" />
+      </div>
+      
       <div className="results-container">
         <div className="header-container">
           <h1 className="destination-title">
-            Flights to {destination}
+            Flights from {origin} to {destination}
           </h1>
           <p className="budget-text">
             Showing flights within your budget of ${budget}
           </p>
         </div>
         
-        {flights.length > 0 ? (
+        {loading ? (
+          <div className="loading">
+            <p>Searching for the purr-fect flights...</p>
+            {/* Add a loading spinner or animation here */}
+          </div>
+        ) : error ? (
+          <div className="no-results">
+            <p className="text-xl text-gray-700">{error}</p>
+            <p className="mt-2 text-gray-500">Try increasing your budget or choosing a different destination.</p>
+          </div>
+        ) : flights.length > 0 ? (
           <div className="flight-cards-container">
             {flights.map((flight, index) => (
               <div key={index} className="flight-card">
                 <div className="airline-header">
                   <h2 className="airline-name">{flight.airline}</h2>
-                  <span className="price-tag">${flight.price}</span>
+                  <span className="price-tag">${flight.price.toFixed(2)}</span>
                 </div>
                 
                 <div className="flight-times">
@@ -96,7 +116,7 @@ const Results = () => {
                   
                   <div className="duration">
                     <div>{flight.duration}</div>
-                    <div>{flight.stops === 0 ? "Nonstop" : `${flight.stops} stop`}</div>
+                    <div>{flight.stops === 0 ? "Nonstop" : `${flight.stops} stop${flight.stops > 1 ? 's' : ''}`}</div>
                   </div>
                   
                   <div className="arrival">
@@ -127,10 +147,6 @@ const Results = () => {
             <p className="mt-2 text-gray-500">Try increasing your budget or choosing a different destination.</p>
           </div>
         )}
-      </div>
-      
-      <div className="logo-container">
-        <img src={catLogo} alt="FareCat Logo" className="cat-logo" />
       </div>
     </div>
   );

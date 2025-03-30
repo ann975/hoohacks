@@ -1,20 +1,22 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles.css";
-import "./Search.css"; // Create this file for the search page styles
-import catLogo from "./cat-logo.jpg"; // Import the cat logo
-
+import "./Search.css";
+import catLogo from "./cat-logo.jpg";
 
 const Search = () => {
+  const [origin, setOrigin] = useState("DCA");
   const [destination, setDestination] = useState("");
   const [budget, setBudget] = useState("");
+  const [departureDate, setDepartureDate] = useState("");
+  const [returnDate, setReturnDate] = useState("");
   const navigate = useNavigate();
 
   const handleSearch = () => {
-    if (destination && budget) {
-      navigate(`/results?destination=${destination}&budget=${budget}`);
+    if (destination && budget && origin && departureDate) {
+      navigate(`/results?origin=${origin}&destination=${destination}&budget=${budget}&departureDate=${departureDate}&returnDate=${returnDate}`);
     } else {
-      alert("Please enter a destination and budget.");
+      alert("Please fill in all required fields.");
     }
   };
 
@@ -37,9 +39,39 @@ const Search = () => {
         <div className="input-group">
           <input
             type="text"
-            placeholder="Enter destination"
+            placeholder="Enter origin airport code (e.g., DCA)"
+            value={origin}
+            onChange={(e) => setOrigin(e.target.value.toUpperCase())}
+            className="search-input"
+          />
+        </div>
+        
+        <div className="input-group">
+          <input
+            type="text"
+            placeholder="Enter destination airport code"
             value={destination}
-            onChange={(e) => setDestination(e.target.value)}
+            onChange={(e) => setDestination(e.target.value.toUpperCase())}
+            className="search-input"
+          />
+        </div>
+        
+        <div className="input-group">
+          <input
+            type="date"
+            placeholder="Departure date"
+            value={departureDate}
+            onChange={(e) => setDepartureDate(e.target.value)}
+            className="search-input"
+          />
+        </div>
+        
+        <div className="input-group">
+          <input
+            type="date"
+            placeholder="Return date (optional)"
+            value={returnDate}
+            onChange={(e) => setReturnDate(e.target.value)}
             className="search-input"
           />
         </div>

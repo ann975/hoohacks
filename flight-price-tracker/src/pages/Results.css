@@ -18,7 +18,7 @@
   /* Logo styling */
   .logo-container {
     position: absolute;
-    top: 130px; /* Moved down from 40px */
+    top: 120px; /* Moved down from 40px */
     left: 0;
     width: 100%;
     text-align: center;
@@ -259,4 +259,30 @@
     .cat-airplane-decoration.cat-4 {
       display: none;
     }
+    
+    /* Occupancy styling */
+.occupancy-container {
+    margin: 1rem 0;
+  }
+  
+  .occupancy-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin-bottom: 0.25rem;
+  }
+  
+  .occupancy-bar-container {
+    height: 6px;
+    background-color: #e5e7eb;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  
+  .occupancy-bar {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+  }
   }

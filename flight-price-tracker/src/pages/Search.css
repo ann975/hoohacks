@@ -134,21 +134,21 @@
 
   /* Cat logo styling */
 .cat-logo-container {
-    margin-bottom: 1.5rem;
-    z-index: 10;
-    position: relative;
-  }
-  
+  margin-bottom: 1.5rem;
+  z-index: 10;
+  position: relative;
+}
+
+.cat-logo {
+  width: 120px;
+  height: auto;
+  border-radius: 50%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
   .cat-logo {
-    width: 120px;
-    height: auto;
-    border-radius: 50%;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100px;
   }
-  
-  @media (max-width: 768px) {
-    .cat-logo {
-      width: 100px;
-    }
-  }
+}
   

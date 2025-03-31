@@ -45,7 +45,7 @@
                 className="cta-button-secondary w-full md:w-auto px-8 py-4 rounded-lg hover:bg-blue-50 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                 aria-label="Learn how flight price tracking works"
               >
-                How It Works
+                How It Works!
               </button>
             </Link>
           </div>
